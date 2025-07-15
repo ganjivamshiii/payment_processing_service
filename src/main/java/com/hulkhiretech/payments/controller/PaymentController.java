@@ -12,16 +12,22 @@ import com.hulkhiretech.payments.dao.TransactionDaoImpl;
 import com.hulkhiretech.payments.dao.interfaces.TransactionDao;
 import com.hulkhiretech.payments.pojo.CreateTxnRequest;
 import org.springframework.web.bind.annotation.RequestBody;
+import com.hulkhiretech.payments.service.impl.PaymentServiceImpl;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/payments")
 @Slf4j
+@RequiredArgsConstructor
 public class PaymentController {
     // ArrayList<CreateTxnRequest> dataadded = new ArrayList<>();
+    private final PaymentServiceImpl paymentServiceImpl;
     @PostMapping
     public String CreatePayment(@RequestBody CreateTxnRequest createTxnRequest) {
         log.info("PaymentController initialized:{}", createTxnRequest);
+        paymentServiceImpl.CreatePayment(createTxnRequest);
         // dataadded.add(createTxnRequest);
         return "Payment created successfully";
     }
@@ -30,9 +36,5 @@ public class PaymentController {
         log.info("for transaction reference: {}", txnReference);
         return "Payment status retrieved successfully"+txnReference;
     }
-    // @GetMapping("/getpayments")
-    // public ArrayList GetAllPayments() {
-    //     log.info("Get all payments called");
-    //     return dataadded;
-    // }
+    
 }

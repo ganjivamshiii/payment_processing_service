@@ -1,8 +1,8 @@
 package com.hulkhiretech.payments.dao.interfaces;
 
 import org.springframework.stereotype.Repository;
-
+import com.hulkhiretech.payments.entity.TransactionEntity;
 
 public interface TransactionDao {
-    public boolean createTransaction();
+    public boolean createTransaction(TransactionEntity entity);
 }
