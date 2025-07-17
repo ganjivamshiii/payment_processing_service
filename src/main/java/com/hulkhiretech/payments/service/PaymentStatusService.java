@@ -22,8 +22,8 @@ public class PaymentStatusService {
 
      public TransactionDTO updatePayment(TransactionDTO txnDTO) {
                log.info("The status handler:{}", txnDTO);
-               int txnStatusId=txnDTO.getTxnStatusId();
-               TransactionStatusEnum statusEnum=TransactionStatusEnum.fromId(txnStatusId);
+               String txnStatus=txnDTO.getTxnStatus();
+               TransactionStatusEnum statusEnum=TransactionStatusEnum.fromName(txnStatus);
                TransactionStatusHandler statusHandler=statusFactory.getTransactionStatusHandler(statusEnum);
               if(statusHandler==null){
                      log.info("Thed transaction_id contains null",statusHandler);

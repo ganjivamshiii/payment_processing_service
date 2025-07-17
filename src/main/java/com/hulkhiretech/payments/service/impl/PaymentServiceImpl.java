@@ -23,16 +23,19 @@ public class PaymentServiceImpl implements PaymentService {
     private final ModelMapper modelMapper;
     private final PaymentStatusService paymentStatusService;
 
+
     @Override
     public CreateTxnResponse CreatePayment(CreateTxnRequest createTxnRequest) {
         log.info("Received payment request | createTxnRequest: {}", createTxnRequest);
+        
 
         String txnReference = UUID.randomUUID().toString();
-        int txnStatusId = 1;
-        log.info("Generated txnReference: {}, txnStatusId: {}", txnReference, txnStatusId);
+        String txnStatus = TransactionStatusEnum.fromName("CREATED").getName();
+        log.info("Generated txnReference: {}, txnStatusId: {}", txnReference, txnStatus);
+
 
         TransactionDTO txnDTO = modelMapper.map(createTxnRequest, TransactionDTO.class);
-        txnDTO.setTxnStatusId(txnStatusId);
+        txnDTO.setTxnStatus(txnStatus);
         txnDTO.setTxnReference(txnReference);
 
         log.info("Passing DTO to PaymentStatusService | txnDTO: {}", txnDTO);
@@ -40,7 +43,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         CreateTxnResponse response = new CreateTxnResponse();
         response.setTxnReference(txnDTO.getTxnReference());
-        response.setTxnStatusId(txnDTO.getTxnStatusId());
+        response.setTxnStatus(txnDTO.getTxnStatus());
 
         log.info("Mapped txnDTO to CreateTxnResponse: {}", response);
         return response;
