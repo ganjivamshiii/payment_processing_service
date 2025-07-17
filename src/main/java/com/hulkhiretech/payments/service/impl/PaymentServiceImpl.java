@@ -5,49 +5,44 @@ import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
-import com.hulkhiretech.payments.service.impl.statushandler.CreatedStatusHandler;
+import com.hulkhiretech.payments.service.PaymentStatusService;
 import com.hulkhiretech.payments.service.interfaces.PaymentService;
-import com.hulkhiretech.payments.service.interfaces.TransactionStatusHandler;
+
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.hulkhiretech.payments.dto.TransactionDTO;
 import com.hulkhiretech.payments.pojo.CreateTxnRequest;
 import com.hulkhiretech.payments.pojo.CreateTxnResponse;
-import com.hulkhiretech.payments.dao.interfaces.TransactionDao;
-import com.hulkhiretech.payments.entity.TransactionEntity;
+import com.hulkhiretech.payments.constant.*;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PaymentServiceImpl implements PaymentService{
-       public final TransactionDao transactionDao;
-       private final CreatedStatusHandler createdStatusHandler;
-       public final ModelMapper modelMapper;
+public class PaymentServiceImpl implements PaymentService {
+    private final ModelMapper modelMapper;
+    private final PaymentStatusService paymentStatusService;
 
-         @Override
-         public CreateTxnResponse CreatePayment(CreateTxnRequest createTxnRequest) {
-                log.info("Received payment request | createTxnRequest: {}", createTxnRequest);
-                String txnReference = UUID.randomUUID().toString();
-		  int txnStatusId = 1;
-		  log.info("Generated txnReference: {}, txnStatusId: {}", txnReference, txnStatusId);
+    @Override
+    public CreateTxnResponse CreatePayment(CreateTxnRequest createTxnRequest) {
+        log.info("Received payment request | createTxnRequest: {}", createTxnRequest);
 
-                log.info("Transaction reference generated: {}", txnReference);
-                TransactionStatusHandler statusHandler = createdStatusHandler; // TODO
-                
-                TransactionDTO  txnDTO=modelMapper.map(createTxnRequest,TransactionDTO.class);
-                txnDTO.setTxnStatusId(txnStatusId);
-                txnDTO.setTxnReference(txnReference);
+        String txnReference = UUID.randomUUID().toString();
+        int txnStatusId = 1;
+        log.info("Generated txnReference: {}, txnStatusId: {}", txnReference, txnStatusId);
 
-                log.info("Passnig DTO to TransactionStatusHandler txnDTO: {}", txnDTO);
-		  txnDTO = statusHandler.handleTransactionStatus(txnDTO);
-		
-		CreateTxnResponse response = new CreateTxnResponse();
-		response.setTxnReference(txnDTO.getTxnReference());
-		response.setTxnStatusId(txnDTO.getTxnStatusId());
-		log.info("Mapped txnDTO to CreateTxnResponse: {}", response);
-		
-		return response;
-         }
-          
+        TransactionDTO txnDTO = modelMapper.map(createTxnRequest, TransactionDTO.class);
+        txnDTO.setTxnStatusId(txnStatusId);
+        txnDTO.setTxnReference(txnReference);
+
+        log.info("Passing DTO to PaymentStatusService | txnDTO: {}", txnDTO);
+        txnDTO = paymentStatusService.updatePayment(txnDTO);
+
+        CreateTxnResponse response = new CreateTxnResponse();
+        response.setTxnReference(txnDTO.getTxnReference());
+        response.setTxnStatusId(txnDTO.getTxnStatusId());
+
+        log.info("Mapped txnDTO to CreateTxnResponse: {}", response);
+        return response;
+    }
 }
