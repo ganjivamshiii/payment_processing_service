@@ -21,15 +21,33 @@ public class PaymentStatusService {
      private final TransactionStatusFactory statusFactory;
 
      public TransactionDTO updatePayment(TransactionDTO txnDTO) {
-               log.info("The status handler:{}", txnDTO);
-               String txnStatus=txnDTO.getTxnStatus();
-               TransactionStatusEnum statusEnum=TransactionStatusEnum.fromName(txnStatus);
-               TransactionStatusHandler statusHandler=statusFactory.getTransactionStatusHandler(statusEnum);
-              if(statusHandler==null){
-                     log.info("Thed transaction_id contains null",statusHandler);
-                     throw new RuntimeException();
-              }
-              txnDTO = statusHandler.handleTransactionStatus(txnDTO);
-              return txnDTO;
-         }
+    log.info("Updating payment with transactionDTO: {}", txnDTO);
+
+    String txnStatus = txnDTO.getTxnStatus();
+
+    if (txnStatus == null) {
+        log.error("Transaction status is null in TransactionDTO");
+        throw new RuntimeException("Transaction status is null");
+    }
+
+    TransactionStatusEnum statusEnum = TransactionStatusEnum.fromName(txnStatus);
+
+    if (statusEnum == null) {
+        log.error("Invalid txnStatus value: {}", txnStatus);
+        throw new RuntimeException("Invalid transaction status: " + txnStatus);
+    }
+
+    TransactionStatusHandler statusHandler = statusFactory.getTransactionStatusHandler(statusEnum);
+
+    if (statusHandler == null) {
+        log.error("No status handler found for statusEnum: {}", statusEnum);
+        throw new RuntimeException("Handler is null for status: " + statusEnum);
+    }
+
+    log.info("Using status handler: {}", statusHandler.getClass().getSimpleName());
+
+    txnDTO = statusHandler.handleTransactionStatus(txnDTO);
+    return txnDTO;
+}
+
 }

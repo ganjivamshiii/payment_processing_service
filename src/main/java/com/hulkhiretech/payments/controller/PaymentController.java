@@ -15,7 +15,8 @@ import com.hulkhiretech.payments.pojo.CreateTxnResponse;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import com.hulkhiretech.payments.service.impl.PaymentServiceImpl;
-
+import com.hulkhiretech.payments.service.impl.statushandler.IntiatedStatusHandler;
+import com.hulkhiretech.payments.pojo.IntiateTxnRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class PaymentController {
-    // ArrayList<CreateTxnRequest> dataadded = new ArrayList<>();
     private final PaymentServiceImpl paymentServiceImpl;
     @PostMapping
     public CreateTxnResponse CreatePayment(@RequestBody CreateTxnRequest createTxnRequest) {
@@ -33,9 +33,10 @@ public class PaymentController {
         return response;
     }
     @PostMapping("/{txnReference}/intiate")
-    public String GetPaymentStatus(@PathVariable String txnReference) {
-        log.info("for transaction reference: {}", txnReference);
-        return "Payment status retrieved successfully"+txnReference;
+    public String GetPaymentStatus(@PathVariable String txnReference, @RequestBody IntiateTxnRequest intiateTxnRequest) {
+               
+         String create= paymentServiceImpl.intiatePayment(txnReference,intiateTxnRequest);
+         return create;
     }
     
 }
